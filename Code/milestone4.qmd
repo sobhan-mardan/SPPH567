@@ -8,27 +8,11 @@ editor: visual
 
 ```
 
-## Packages 
+## Packages
+
 ```{r}
 pacman::p_load(tidyverse)
 ```
-
-
-## Steps to configureing GitHub 
-
-### Set up 
-
-git config --global user.name "username"
-
-git config --global user.email "email"
-
-
-
-### connect to repository 
-
-git remote add 
-
-
 
 ## Assignment Details
 
@@ -39,12 +23,15 @@ Please prepare a document containing the 4 pieces of information requested below
 For the two categorical variables (choose two for this milestone if you have more than two), provide box plots of the relationships with the exposure variable using the log-transformed values.
 
 ### Objective 2
+
 For the two categorical variables, provide the results of ANOVA against the log-transformed exposure variable. If there is a significant association, provide the results of a Tukey HSD test.
 
 ### Objective 3
+
 For the two categorical variables, provide the results of a linear regression model using the log-transformed values, including the estimated risk ratios for each variable category and their confidence intervals.
 
 ### Objective 4
+
 Using information from 1-3, write a short interpretation (\<100 words) of your findings for each variable. Again, this can be done in bullet form for the milestone. Do not simply repeat the results reported in 1-3; use your knowledge and experience to describe their meaning.
 
 ```{r}
