@@ -1,0 +1,58 @@
+---
+title: "milestone4"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+
+```
+
+## Packages 
+```{r}
+pacman::p_load(tidyverse)
+```
+
+
+## Steps to configureing GitHub 
+
+### Set up 
+
+git config --global user.name "username"
+
+git config --global user.email "email"
+
+
+
+### connect to repository 
+
+git remote add 
+
+
+
+## Assignment Details
+
+Please prepare a document containing the 4 pieces of information requested below, in the order listed. This does not have to be fancy or attractively formatted! There's no page limit or expectation. Screenshots of R output are perfectly acceptable. All plots should have titles and axis labels that are easy to interpret.
+
+### Objective 1
+
+For the two categorical variables (choose two for this milestone if you have more than two), provide box plots of the relationships with the exposure variable using the log-transformed values.
+
+### Objective 2
+For the two categorical variables, provide the results of ANOVA against the log-transformed exposure variable. If there is a significant association, provide the results of a Tukey HSD test.
+
+### Objective 3
+For the two categorical variables, provide the results of a linear regression model using the log-transformed values, including the estimated risk ratios for each variable category and their confidence intervals.
+
+### Objective 4
+Using information from 1-3, write a short interpretation (\<100 words) of your findings for each variable. Again, this can be done in bullet form for the milestone. Do not simply repeat the results reported in 1-3; use your knowledge and experience to describe their meaning.
+
+```{r}
+
+df.no2 = 
+  read_csv("../Data/no2_lme.csv") 
+
+df.no2$no2.mle <- round(df.no2$no2.mle, 2)
+
+
+```
