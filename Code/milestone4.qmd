@@ -1,18 +1,60 @@
 ---
 title: "milestone4"
-format: html
+format: 
+  html:
+    toc: true
+    theme: cosmo
+    code-fold: true
 editor: visual
 ---
 
 ```{r setup, include=FALSE}
-
+# quarto::quarto_render(execute_dir = "../Results")
 ```
 
 ## Packages
 
 ```{r}
-pacman::p_load(tidyverse)
+pacman::p_load(tidyverse,gtsummary)
 ```
+
+## Data 
+
+```{r}
+df.no2 = 
+  read_csv("../Data/no2_lme.csv") 
+
+df.no2$no2.mle <- round(df.no2$no2.mle, 2)
+
+## creating log no2 
+df.no2$log.no2 <- log(df.no2$no2.mle)
+
+## Creating wind_condensed variable 
+
+df.no2$wind_direction_condensed <- case_when(
+  df.no2$wind_direction %in% c("N", "NNE", "NNW", "NW") ~ "North",
+  df.no2$wind_direction %in% c("E", "ENE", "ESE", "NE") ~ "East",
+  df.no2$wind_direction %in% c("S", "SSE", "SSW", "SE") ~ "South",
+  df.no2$wind_direction %in% c("W", "WNW", "WSW", "SW") ~ "West",
+  TRUE ~ as.character(df.no2$wind_direction)
+)
+
+df.no2$wind_direction_condensed = factor(df.no2$wind_direction_condensed, 
+                                         levels = c("South", "North", "East","West"))
+
+
+## Creating condition categories 
+
+df.no2$condition_cat <- case_when(
+  df.no2$condition_text %in% c("Clear", "Sunny", "Partly cloudy", "Partly Cloudy") ~ "Clear",
+  df.no2$condition_text %in% c("Cloudy", "Overcast", "Mist", "Fog", "Freezing fog") ~ "Cloudy",
+  TRUE ~ "Rainy")
+
+df.no2$condition_cat <- factor(df.no2$condition_cat, 
+                               levels = c("Rainy", "Clear", "Cloudy"))
+
+```
+
 
 ## Assignment Details
 
@@ -22,24 +64,142 @@ Please prepare a document containing the 4 pieces of information requested below
 
 For the two categorical variables (choose two for this milestone if you have more than two), provide box plots of the relationships with the exposure variable using the log-transformed values.
 
+```{r}
+
+boxplot(df.no2$log.no2 ~ df.no2$wind_direction_condensed,
+        xlab = "Wind Direction (Quadrants)",
+        ylab = "Log (NO2) ug/m3", 
+        main = "Log-transformed concentration of NO2 by Wind Direction")
+
+
+```
+
+<br>
+
+```{r}
+
+boxplot(df.no2$log.no2 ~ df.no2$condition_cat,
+        xlab = "Weather Conditions",
+        ylab = "Log (NO2) ug/m3", 
+        main = "Log-transformed concentration of NO2 by Weather Conditions"
+        )
+```
+
+
 ### Objective 2
 
 For the two categorical variables, provide the results of ANOVA against the log-transformed exposure variable. If there is a significant association, provide the results of a Tukey HSD test.
+
+**Wind direction**
+
+<br>
+
+ANOVA summary  (*slightly different than in Google sheets*)
+```{r}
+aov.wind = aov(df.no2$log.no2 ~ df.no2$wind_direction_condensed)
+
+summary(aov.wind)
+
+```
+
+Tukey results 
+```{r}
+TukeyHSD(aov.wind)
+```
+<br>
+
+
+**Weather conditions**
+
+ANOVA summary 
+```{r}
+
+aov.weather = aov(df.no2$log.no2 ~ df.no2$condition_cat)
+
+summary(aov.weather)
+```
+
+
+Tukey summary (*slightly different than in Google sheets*)
+```{r}
+TukeyHSD(aov.weather)
+```
+
+
 
 ### Objective 3
 
 For the two categorical variables, provide the results of a linear regression model using the log-transformed values, including the estimated risk ratios for each variable category and their confidence intervals.
 
+
+
+```{r}
+
+## changing the levels of weather conditions to match what is in the google sheet
+df.no2$condition_cat2 <- factor(df.no2$condition_cat, 
+                               levels = c("Clear", "Cloudy","Rainy")
+                                 )
+
+lm.weather <- lm(log.no2 ~ condition_cat2, data = df.no2)
+
+summary(lm.weather)
+```
+Results of weather conditions model with exponentiation coefficients 
+
+```{r}
+
+data.frame(
+  coef = exp(lm.weather$coefficients), 
+  ci = exp(confint(lm.weather))
+) %>% 
+  mutate_if(is.double, ~round(.x, 2))
+
+```
+
+Results of wind direction model with exponentiation coefficients 
+```{r}
+## changing the levels of wind directions to match what is in the Google sheet
+df.no2$wind_direction_condensed2 <- factor(df.no2$wind_direction_condensed, 
+                               levels = c("East","North","South", "West")
+                                 )
+
+
+lm.wind <- lm(log.no2 ~ wind_direction_condensed2, data = df.no2)
+
+summary(lm.wind)
+```
+```{r}
+data.frame(
+  coef = exp(lm.wind$coefficients), 
+  ci = exp(confint(lm.wind))
+) %>% 
+  mutate_if(is.double, ~round(.x, 2))
+
+```
+
+
 ### Objective 4
 
 Using information from 1-3, write a short interpretation (\<100 words) of your findings for each variable. Again, this can be done in bullet form for the milestone. Do not simply repeat the results reported in 1-3; use your knowledge and experience to describe their meaning.
 
-```{r}
-
-df.no2 = 
-  read_csv("../Data/no2_lme.csv") 
-
-df.no2$no2.mle <- round(df.no2$no2.mle, 2)
 
 
-```
+1)  During clear days the geometric mean of NO2 concentration is the highest at 2.80 ug/m3.
+2) Rain decreases the pollution of NO2 by 0.76 [95% CI: 0.64,0.90] fold compared to clear days. 
+3) The Geometric mean of NO2 concentration is the highest when wind is blowing East at 1.20 ug/m3. 
+4) The Geometric mean of NO2 concentration decreases by 0.79 [95% CI: 0.70, 0.90] fold when it's blowing north and 0.59 [95% CI: 0.51,0.68] fold when it's blowing south. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
