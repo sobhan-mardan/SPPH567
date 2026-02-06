@@ -5,6 +5,7 @@ format:
     toc: true
     theme: cosmo
     code-fold: true
+    embed-resources: true
 editor: visual
 ---
 
